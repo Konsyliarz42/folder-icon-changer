@@ -37,14 +37,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake9 mypy pylint
 
-    - name: flake9
-      run: |
-        python -m flake8 icons_changer
+      - name: flake9
+        run: |
+          python -m flake8 icons_changer
 
-    - name: mypy
-      run: |
-        python -m mypy icons_changer
+      - name: mypy
+        run: |
+          python -m mypy icons_changer
 
-    - name: pylint
-      run: |
-        python -m pylint icons_changer
+      - name: pylint
+        run: |
+          python -m pylint icons_changer
