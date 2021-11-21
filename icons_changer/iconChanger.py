@@ -6,6 +6,8 @@ from configparser import ConfigParser
 
 
 INI_NAME = "desktop.ini"
+JSON_ADDING_KEY = "ADDING"
+JSON_REMOVING_KEY = "REMOVING"
 
 
 @dataclass
@@ -29,7 +31,7 @@ class IconChanger():
 
         if ini_path.exists():
             config.read(ini_path)
-            subprocess.run(['attrib', '-s', '-h', ini_path], shell=True)
+            subprocess.run(['attrib', '-s', '-h', ini_path], shell=True)    # Remove system file and hidden attribute
         else:
             config['.ShellClassInfo'] = dict()
 
@@ -38,16 +40,16 @@ class IconChanger():
         with open(ini_path, 'w', encoding="utf-8") as inifile:
             config.write(inifile)
 
-        subprocess.run(['attrib', '+s', '+h', ini_path], shell=True)
-        subprocess.run(['attrib', '+r', folder_path], shell=True)
+        subprocess.run(['attrib', '+s', '+h', ini_path], shell=True)    # Add system file and hidden attribute
+        subprocess.run(['attrib', '+r', folder_path], shell=True)       # Add read only attribute
 
     def _delete_ini(self, folder_path: Path):
 
         ini_path = folder_path.joinpath(INI_NAME)
 
         if ini_path.exists():
-            subprocess.run(['attrib', '-s', '-h', ini_path], shell=True)
-            subprocess.run(['attrib', '-r', folder_path], shell=True)
+            subprocess.run(['attrib', '-s', '-h', ini_path], shell=True)    # Remove system file and hidden attribute
+            subprocess.run(['attrib', '-r', folder_path], shell=True)       # Remove read only attribute
             ini_path.unlink()
 
     def add(self, folder_path: str, icon_path: str, icon_index: int=0):
@@ -65,15 +67,15 @@ class IconChanger():
         with open(json_path, 'r') as jsonfile:
             data = json.loads(jsonfile.read())
 
-        if "ADDING" in data.keys():
+        if JSON_ADDING_KEY in data.keys():
             json_folders = [
                 Folder(key, value[0], value[1])
-                for key, value in data["ADDING"].items()
+                for key, value in data[JSON_ADDING_KEY].items()
             ]
             self.folder_icons.extend(json_folders)
 
-        if "REMOVING" in data.keys():
-            json_folders = data["REMOVING"]
+        if JSON_REMOVING_KEY in data.keys():
+            json_folders = data[JSON_REMOVING_KEY]
             self.reset_folders.extend(json_folders)
 
     def remove(self, folder_path: str):
