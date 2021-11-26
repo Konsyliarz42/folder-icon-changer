@@ -1,106 +1,102 @@
 import subprocess
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from configparser import ConfigParser
+from logging import getLogger
+from typing import Union
 
 
 INI_NAME = "desktop.ini"
-JSON_ADDING_KEY = "ADDING"
-JSON_REMOVING_KEY = "REMOVING"
+INI_SECTION = '.ShellClassInfo'
+INI_OPTIONS = ['IconFile', 'IconIndex', "ConfirmFileOp"]
+
+logger = getLogger(__name__)
 
 
 @dataclass
 class Folder:
-    folder_path: str
-    icon_path: str
-    icon_index: int
+    folder_path: Path
+    icon_path: Union[None, Path]
+    icon_index: int = 0
+
+    @property
+    def ini_path(self):
+        return self.folder_path.joinpath(INI_NAME)
+
+    @property
+    def ini_config(self):
+        config = ConfigParser()
+        
+        if self.icon_path.exists():
+            config.add_section(INI_SECTION)
+            values = [self.icon_path, self.icon_index, 0]
+
+            for option, value in zip(INI_OPTIONS, values):
+                config[INI_SECTION][option] = str(value)
+
+        return config
+
+    @property
+    def may_delete_ini(self):
+        return not self.icon_path and self.ini_path.exists()
 
 
 class IconChanger():
 
     def __init__(self):
         
-        self.folder_icons: list[Folder] = list()
-        self.reset_folders: list[str] = list()
+       self.folders: list[Folder] = list()
 
-    def _generate_ini(self, folder_path: Path, icon_path: Path, icon_index: int=0):
+    def add_folder(self, folder_path: str, icon_path: Union[None, str]=None, icon_index: int=0):
+        """Add folder with icon to folder's list.
 
-        ini_path = folder_path.joinpath(INI_NAME)
-        config = ConfigParser()
+        Args:
+            folder_path (str): Path to chosen folder.
+            icon_path (Union[None, str], optional): Path to icon file if None set default icon. Defaults to None.
+            icon_index (int, optional): Index of icon in icon file. Defaults to 0.
+        """
 
-        if ini_path.exists():
-            config.read(ini_path)
-            subprocess.run(['attrib', '-s', '-h', ini_path], shell=True)    # Remove system file and hidden attribute
-        else:
-            config['.ShellClassInfo'] = dict()
-
-        config['.ShellClassInfo']['IconResource'] = str(icon_path.absolute()) + f',{icon_index}'
-
-        with open(ini_path, 'w', encoding="utf-8") as inifile:
-            config.write(inifile)
-
-        subprocess.run(['attrib', '+s', '+h', ini_path], shell=True)    # Add system file and hidden attribute
-        subprocess.run(['attrib', '+r', folder_path], shell=True)       # Add read only attribute
-
-    def _delete_ini(self, folder_path: Path):
-
-        ini_path = folder_path.joinpath(INI_NAME)
-
-        if ini_path.exists():
-            subprocess.run(['attrib', '-s', '-h', ini_path], shell=True)    # Remove system file and hidden attribute
-            subprocess.run(['attrib', '-r', folder_path], shell=True)       # Remove read only attribute
-            ini_path.unlink()
-
-    def add(self, folder_path: str, icon_path: str, icon_index: int=0):
-
-        folder_path = str(Path(folder_path).absolute())
-        icon_path = str(Path(icon_path).absolute())
-        self.folder_icons.append(Folder(
-            folder_path=folder_path,
-            icon_path=icon_path,
-            icon_index=icon_index,
+        logger.warning("Add %s to folder list", Path(folder_path).absolute())
+        self.folders.append(Folder(
+            folder_path=Path(folder_path).absolute(),
+            icon_path=Path(icon_path).absolute() if icon_path else None,
+            icon_index=icon_index
         ))
 
-    def include_json(self, json_path: str):
+    def remove_folder(self, index_or_object: Union[int, Folder]):
+        """Remove folder from folder's list.
 
-        with open(json_path, 'r') as jsonfile:
-            data = json.loads(jsonfile.read())
+        Args:
+            index_or_object (Union[int, Folder]): Index from list or object from folder's list.
+        """
 
-        if JSON_ADDING_KEY in data.keys():
-            json_folders = [
-                Folder(key, value[0], value[1])
-                for key, value in data[JSON_ADDING_KEY].items()
-            ]
-            self.folder_icons.extend(json_folders)
+        if type(index_or_object) == int:
+            logger.warning("Remove %s form folder list", self.folders[index_or_object].folder_path)
+            self.folders.pop(index_or_object)
+        else:
+            logger.warning("Remove %s form folder list", index_or_object.folder_path)
+            self.folders.remove(index_or_object)
 
-        if JSON_REMOVING_KEY in data.keys():
-            json_folders = data[JSON_REMOVING_KEY]
-            self.reset_folders.extend(json_folders)
+    def set_icon(self, folder: Folder):
+        """Save desktop.ini with new icon, or delete to set default icon.
 
-    def remove(self, folder_path: str):
+        Args:
+            folder (Folder): Folder object from folder's list.
+        """
 
-        folder_path = str(Path(folder_path).absolute())
-        folder = [f for f in self.folder_icons if f.folder_path == folder_path][0]
-        self.folder_icons.remove(folder)
+        if folder.ini_path.exists():
+            subprocess.run(['attrib', '-s', '-h', folder.ini_path], shell=True)
 
-    def delete(self, folder_path: str):
+        if folder.may_delete_ini:
+            logger.warning("Delete %s", folder.ini_path)
+            folder.ini_path.unlink()  
+        else:
+            logger.warning("Save %s", folder.ini_path)
 
-        folder_path = str(Path(folder_path).absolute())
+            with open(folder.ini_path, 'w', encoding="utf-8") as inifile:
+                folder.ini_config.write(inifile, space_around_delimiters=False)
 
-        if folder_path not in self.reset_folders:
-            self.reset_folders.append(folder_path)
-
-    def start_changing(self):
-
-        for folder in self.folder_icons:
-            self._generate_ini(
-                Path(folder.folder_path).absolute(),
-                Path(folder.icon_path).absolute(),
-                folder.icon_index
-            )
-
-        for folder in self.reset_folders:
-            self._delete_ini(
-                Path(folder).absolute()
-            )
+            logger.warning("Add attributes system (+s) and hidden (+h) to %s", folder.ini_path)
+            subprocess.run(['attrib', '+s', '+h', folder.ini_path], shell=True)
+            logger.warning("Add read only attribute to %s", folder.folder_path)
+            subprocess.run(['attrib', '+r', folder.folder_path], shell=True) 
