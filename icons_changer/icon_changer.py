@@ -27,7 +27,7 @@ class Folder:
     def ini_config(self):
         config = ConfigParser()
         
-        if self.icon_path.exists():
+        if self.icon_path and self.icon_path.exists():
             config.add_section(INI_SECTION)
             values = [self.icon_path, self.icon_index, 0]
 
@@ -47,7 +47,7 @@ class IconChanger():
         
        self.folders: list[Folder] = list()
 
-    def add_folder(self, folder_path: str, icon_path: Union[None, str]=None, icon_index: int=0):
+    def add_folder(self, folder_path: str, icon_path: Union[None, str]=None, icon_index: int=0) -> Folder:
         """Add folder with icon to folder's list.
 
         Args:
@@ -57,11 +57,14 @@ class IconChanger():
         """
 
         logger.warning("Add %s to folder list", Path(folder_path).absolute())
-        self.folders.append(Folder(
+        folder = Folder(
             folder_path=Path(folder_path).absolute(),
             icon_path=Path(icon_path).absolute() if icon_path else None,
             icon_index=icon_index
-        ))
+        )
+        self.folders.append(folder)
+
+        return folder
 
     def remove_folder(self, index_or_object: Union[int, Folder]):
         """Remove folder from folder's list.
