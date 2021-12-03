@@ -1,6 +1,6 @@
 # Check unittests
 
-name: Python application
+name: Unittests
 on: [push]
 jobs:
 
