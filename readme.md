@@ -1,6 +1,7 @@
 # Folder Icon Changer
 
-[![Python application](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml/badge.svg)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml)
+[![Python application](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml/badge.svg?branch=master&event=push)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml)
+[![Unittests](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/unittests.yml/badge.svg?branch=master&event=push)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/unittests.yml)
 
 > ONLY FOR WINDOWS SYSTEM!
 
