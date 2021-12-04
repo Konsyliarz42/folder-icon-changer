@@ -74,7 +74,7 @@ class IconChanger:
             index_or_object (Union[int, Folder]): Index from list or object from folder's list.
         """
 
-        if type(index_or_object) == int:
+        if isinstance(index_or_object, int):
             logger.warning(
                 "Remove %s form folder list", self.folders[index_or_object].folder_path
             )
@@ -83,7 +83,8 @@ class IconChanger:
             logger.warning("Remove %s form folder list", index_or_object.folder_path)  # type: ignore
             self.folders.remove(index_or_object)  # type: ignore
 
-    def set_icon(self, folder: Folder):
+    @classmethod
+    def set_icon(cls, folder: Folder):
         """Save desktop.ini with new icon, or delete to set default icon.
 
         Args:
@@ -91,7 +92,7 @@ class IconChanger:
         """
 
         if folder.ini_path.exists():
-            subprocess.run(["attrib", "-s", "-h", folder.ini_path], shell=True)
+            subprocess.run(["attrib", "-s", "-h", folder.ini_path], shell=True, check=False)
 
         if folder.may_delete_ini:
             logger.warning("Delete %s", folder.ini_path)
@@ -105,6 +106,6 @@ class IconChanger:
             logger.warning(
                 "Add attributes system (+s) and hidden (+h) to %s", folder.ini_path
             )
-            subprocess.run(["attrib", "+s", "+h", folder.ini_path], shell=True)
+            subprocess.run(["attrib", "+s", "+h", folder.ini_path], shell=True, check=False)
             logger.warning("Add read only attribute to %s", folder.folder_path)
-            subprocess.run(["attrib", "+r", folder.folder_path], shell=True)
+            subprocess.run(["attrib", "+r", folder.folder_path], shell=True, check=False)
