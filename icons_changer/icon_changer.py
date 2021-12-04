@@ -80,8 +80,8 @@ class IconChanger:
             )
             self.folders.pop(index_or_object)
         else:
-            logger.warning("Remove %s form folder list", index_or_object.folder_path)
-            self.folders.remove(index_or_object)
+            logger.warning("Remove %s form folder list", index_or_object.folder_path)  # type: ignore
+            self.folders.remove(index_or_object)  # type: ignore
 
     def set_icon(self, folder: Folder):
         """Save desktop.ini with new icon, or delete to set default icon.
