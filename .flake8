@@ -1,0 +1,17 @@
+[flake8]
+exclude =
+    .git
+    __pycache__
+    docs/source/conf.py
+    old
+    build
+    dist
+    venv
+
+ignore =
+    E731
+    E501
+
+per-file-ignores =
+    __init__.py: F401
+    __main__.py: F401
