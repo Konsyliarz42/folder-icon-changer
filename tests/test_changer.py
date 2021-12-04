@@ -5,8 +5,8 @@ from configparser import ConfigParser
 from icons_changer.icon_changer import IconChanger
 
 INI_NAME = "desktop.ini"
-INI_SECTION = '.ShellClassInfo'
-INI_OPTIONS = ['IconFile', 'IconIndex', "ConfirmFileOp"]
+INI_SECTION = ".ShellClassInfo"
+INI_OPTIONS = ["IconFile", "IconIndex", "ConfirmFileOp"]
 
 TEST_FOLDER_PATH = "tests/test-folder"
 TEST_ICON_PATH = TEST_FOLDER_PATH + "/test-icon.ico"
@@ -48,10 +48,7 @@ class TestChanger(TestCase):
         for option in INI_OPTIONS:
             self.assertTrue(folder.ini_config.has_option(INI_SECTION, option))
 
-        self.assertEqual(
-            folder.ini_path,
-            folder.folder_path.joinpath(INI_NAME)
-        )
+        self.assertEqual(folder.ini_path, folder.folder_path.joinpath(INI_NAME))
 
     def test_change_icon(self):
         """

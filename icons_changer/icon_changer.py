@@ -7,8 +7,8 @@ from typing import Union
 
 
 INI_NAME = "desktop.ini"
-INI_SECTION = '.ShellClassInfo'
-INI_OPTIONS = ['IconFile', 'IconIndex', "ConfirmFileOp"]
+INI_SECTION = ".ShellClassInfo"
+INI_OPTIONS = ["IconFile", "IconIndex", "ConfirmFileOp"]
 
 logger = getLogger(__name__)
 
@@ -26,7 +26,7 @@ class Folder:
     @property
     def ini_config(self):
         config = ConfigParser()
-        
+
         if self.icon_path and self.icon_path.exists():
             config.add_section(INI_SECTION)
             values = [self.icon_path, self.icon_index, 0]
@@ -41,13 +41,14 @@ class Folder:
         return not self.icon_path and self.ini_path.exists()
 
 
-class IconChanger():
-
+class IconChanger:
     def __init__(self):
-        
-       self.folders: list[Folder] = list()
 
-    def add_folder(self, folder_path: str, icon_path: Union[None, str]=None, icon_index: int=0) -> Folder:
+        self.folders: list[Folder] = list()
+
+    def add_folder(
+        self, folder_path: str, icon_path: Union[None, str] = None, icon_index: int = 0
+    ) -> Folder:
         """Add folder with icon to folder's list.
 
         Args:
@@ -60,7 +61,7 @@ class IconChanger():
         folder = Folder(
             folder_path=Path(folder_path).absolute(),
             icon_path=Path(icon_path).absolute() if icon_path else None,
-            icon_index=icon_index
+            icon_index=icon_index,
         )
         self.folders.append(folder)
 
@@ -74,7 +75,9 @@ class IconChanger():
         """
 
         if type(index_or_object) == int:
-            logger.warning("Remove %s form folder list", self.folders[index_or_object].folder_path)
+            logger.warning(
+                "Remove %s form folder list", self.folders[index_or_object].folder_path
+            )
             self.folders.pop(index_or_object)
         else:
             logger.warning("Remove %s form folder list", index_or_object.folder_path)
@@ -88,18 +91,20 @@ class IconChanger():
         """
 
         if folder.ini_path.exists():
-            subprocess.run(['attrib', '-s', '-h', folder.ini_path], shell=True)
+            subprocess.run(["attrib", "-s", "-h", folder.ini_path], shell=True)
 
         if folder.may_delete_ini:
             logger.warning("Delete %s", folder.ini_path)
-            folder.ini_path.unlink()  
+            folder.ini_path.unlink()
         else:
             logger.warning("Save %s", folder.ini_path)
 
-            with open(folder.ini_path, 'w', encoding="utf-8") as inifile:
+            with open(folder.ini_path, "w", encoding="utf-8") as inifile:
                 folder.ini_config.write(inifile, space_around_delimiters=False)
 
-            logger.warning("Add attributes system (+s) and hidden (+h) to %s", folder.ini_path)
-            subprocess.run(['attrib', '+s', '+h', folder.ini_path], shell=True)
+            logger.warning(
+                "Add attributes system (+s) and hidden (+h) to %s", folder.ini_path
+            )
+            subprocess.run(["attrib", "+s", "+h", folder.ini_path], shell=True)
             logger.warning("Add read only attribute to %s", folder.folder_path)
-            subprocess.run(['attrib', '+r', folder.folder_path], shell=True) 
+            subprocess.run(["attrib", "+r", folder.folder_path], shell=True)
