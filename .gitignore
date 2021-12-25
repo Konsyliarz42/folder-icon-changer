@@ -1,6 +1,10 @@
 __pycache__/
 .vscode/
 venv/
+build/
+dist/
 
 * copy *
 * copy.*
+
+*.spec
