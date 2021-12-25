@@ -1,0 +1,9 @@
+{
+    "EN": {
+        "TITLE": "Folder Icons changer",
+        "BUTTON_SELECT_DIRECTORY": "Select directory",
+        "BUTTON_SELECT_ICON": "Select icon",
+        "BUTTON_SET_ICON": "Set new icon",
+        "DEFAULT_DIRECTORY_NAME": "Directory"
+    }
+}
