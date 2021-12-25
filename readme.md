@@ -1,4 +1,4 @@
-![Logo](./assets/logo.png)
+![Logo](./assets/Logo.png)
 
 [![Python application](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml/badge.svg?event=push)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml)
 [![Unittests](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/unittests.yml/badge.svg?branch=master&event=push)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/unittests.yml)
