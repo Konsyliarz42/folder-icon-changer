@@ -1,0 +1,22 @@
+{
+    "Git": "assets/brands/git_folder.ico",
+    "Microsoft Office": "assets/brands/office_folder.ico",
+    "Mozilla Firefox": "assets/brands/firefox_folder.ico",
+    "Epic Games": "assets/brands/epic_folder.ico",
+    "EpicLibrary": "assets/brands/epic_folder.ico",
+    "Microsoft Visual Studio": "assets/brands/vs_folder.ico",
+    "Steam": "assets/brands/steam_folder.ico",
+    "SteamLibrary": "assets/brands/steam_folder.ico",
+    "Microsoft VS Code": "assets/brands/vscode_folder.ico",
+    "Blender": "assets/brands/blender_folder.ico",
+    "_Blender": "assets/brands/blender_folder.ico",
+    "Desktop": "assets/system/white_folder_desktop.ico",
+    "Documents": "assets/system/black_folder_documents.ico",
+    "Downloads": "assets/system/bone_folder_downloads.ico",
+    "Favorites": "assets/system/blue_folder_favorites.ico",
+    "Games": "assets/system/lightblue_folder_games.ico",
+    "Music": "assets/system/green_folder_music.ico",
+    "Muzyka": "assets/system/green_folder_music.ico",
+    "Pictures": "assets/system/cyan_folder_pictures.ico",
+    "Videos": "assets/system/red_folder_movies.ico"
+}
