@@ -7,3 +7,6 @@ dist/
 
 * copy *
 * copy.*
+
+*.spec
+main.py
