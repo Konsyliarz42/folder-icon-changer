@@ -1,111 +1,81 @@
 import subprocess
-from dataclasses import dataclass
+import logging
 from pathlib import Path
 from configparser import ConfigParser
-from logging import getLogger
-from typing import Union
 
 
-INI_NAME = "desktop.ini"
-INI_SECTION = ".ShellClassInfo"
-INI_OPTIONS = ["IconFile", "IconIndex", "ConfirmFileOp"]
+INI_FILE = "desktop.ini"
+INI_CONFIG = {
+    ".ShellClassInfo": {
+        "IconResource": "",
+        "IconFile": "",
+        "IconIndex": "",
+    },
+    "ViewState": {
+        "Mode": "",
+        "Vid": "",
+        "FolderType": "Generic",
+    },
+}
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
-@dataclass
-class Folder:
-    folder_path: Path
-    icon_path: Union[None, Path]
-    icon_index: int = 0
+class Directory:
+
+    def __init__(self, path: str) -> None:
+        self.path = Path(path).absolute()
 
     @property
-    def ini_path(self):
-        return self.folder_path.joinpath(INI_NAME)
+    def ini_path(self) -> Path:
+        return self.path.joinpath(INI_FILE)
 
     @property
-    def ini_config(self):
+    def ini_path_alternative(self) -> Path:
+        return self.path.joinpath(INI_FILE.capitalize())
+
+    @property
+    def ini_content(self) -> ConfigParser:
+
         config = ConfigParser()
 
-        if self.icon_path and self.icon_path.exists():
-            config.add_section(INI_SECTION)
-            values = [self.icon_path, self.icon_index, 0]
+        if self.ini_path.exists():
+            config.read(self.ini_path)
+        elif self.ini_path_alternative.exists():
+            config.read(self.ini_path_alternative)
 
-            for option, value in zip(INI_OPTIONS, values):
-                config[INI_SECTION][option] = str(value)
+        for section, options in INI_CONFIG.items():
+            if not config.has_section(section):
+                config.add_section(section)
+            
+            for option, value in options.items():
+                if not config.has_option(section, option):
+                    config[section][option] = value
 
         return config
 
-    @property
-    def may_delete_ini(self):
-        return not self.icon_path and self.ini_path.exists()
+    def set_icon(self, icon_path: str, icon_index: int=0) -> None:
 
+        icon = Path(icon_path).absolute()
 
-class IconChanger:
-    def __init__(self):
+        if icon.exists():
+            icon_resource = f"{icon_path},{icon_index}"
+            config = self.ini_content
+            config[".ShellClassInfo"]["IconResource"] = icon_resource
+            config[".ShellClassInfo"]["IconFile"] = icon_path
+            config[".ShellClassInfo"]["IconIndex"] = str(icon_index)
 
-        self.folders: list[Folder] = list()
+            if self.ini_path.exists():
+                subprocess.run(["attrib", "-s", "-h", self.ini_path], shell=True, check=False)
 
-    def add_folder(
-        self, folder_path: str, icon_path: Union[None, str] = None, icon_index: int = 0
-    ) -> Folder:
-        """Add folder with icon to folder's list.
+            with open(self.ini_path, "w", encoding="utf-8") as file:
+                config.write(file, space_around_delimiters=False)
 
-        Args:
-            folder_path (str): Path to chosen folder.
-            icon_path (Union[None, str], optional): Path to icon file if None set default icon. Defaults to None.
-            icon_index (int, optional): Index of icon in icon file. Defaults to 0.
-        """
+            subprocess.run(["attrib", "+s", "+h", self.ini_path], shell=True, check=False)
+            subprocess.run(["attrib", "+r", self.path], shell=True, check=False)
 
-        logger.warning("Add %s to folder list", Path(folder_path).absolute())
-        folder = Folder(
-            folder_path=Path(folder_path).absolute(),
-            icon_path=Path(icon_path).absolute() if icon_path else None,
-            icon_index=icon_index,
-        )
-        self.folders.append(folder)
+    def remove_icon(self) -> None:
 
-        return folder
-
-    def remove_folder(self, index_or_object: Union[int, Folder]):
-        """Remove folder from folder's list.
-
-        Args:
-            index_or_object (Union[int, Folder]): Index from list or object from folder's list.
-        """
-
-        if isinstance(index_or_object, int):
-            logger.warning(
-                "Remove %s form folder list", self.folders[index_or_object].folder_path
-            )
-            self.folders.pop(index_or_object)
-        else:
-            logger.warning("Remove %s form folder list", index_or_object.folder_path)  # type: ignore
-            self.folders.remove(index_or_object)  # type: ignore
-
-    @classmethod
-    def set_icon(cls, folder: Folder):
-        """Save desktop.ini with new icon, or delete to set default icon.
-
-        Args:
-            folder (Folder): Folder object from folder's list.
-        """
-
-        if folder.ini_path.exists():
-            subprocess.run(["attrib", "-s", "-h", folder.ini_path], shell=True, check=False)
-
-        if folder.may_delete_ini:
-            logger.warning("Delete %s", folder.ini_path)
-            folder.ini_path.unlink()
-        else:
-            logger.warning("Save %s", folder.ini_path)
-
-            with open(folder.ini_path, "w", encoding="utf-8") as inifile:
-                folder.ini_config.write(inifile, space_around_delimiters=False)
-
-            logger.warning(
-                "Add attributes system (+s) and hidden (+h) to %s", folder.ini_path
-            )
-            subprocess.run(["attrib", "+s", "+h", folder.ini_path], shell=True, check=False)
-            logger.warning("Add read only attribute to %s", folder.folder_path)
-            subprocess.run(["attrib", "+r", folder.folder_path], shell=True, check=False)
+        if self.ini_path.exists():
+            subprocess.run(["attrib", "-s", "-h", self.ini_path], shell=True, check=False)
+            self.ini_path.unlink()

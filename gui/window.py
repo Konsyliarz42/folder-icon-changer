@@ -3,14 +3,14 @@ from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
-    QLabel,
 )
-from PyQt6.QtGui import QFont, QIcon
+from PyQt6.QtGui import  QIcon
 from PyQt6.QtCore import QSize
 
-from . import text
-from .buttons import Buttons
-from .icon_view import IconView
+from .columns import FirstColumn, SecondColumn
+
+WINDOW_TITLE = "Folder Icons Changer"
+WINDOW_ICON = "assets/colorfull_folder.ico"
 
 
 class MainWindow(QMainWindow):
@@ -20,22 +20,18 @@ class MainWindow(QMainWindow):
 
         widget = QWidget()
         layout = QVBoxLayout()
-        panel = QHBoxLayout()
-        old_icon = IconView()
-        new_icon = IconView()
-        buttons = Buttons(widget, (old_icon, new_icon))
-        arrow = QLabel("➜")
+        columns = QHBoxLayout()
 
-        arrow.setFont(QFont("Arial", 16))
+        self.first_column = FirstColumn()
+        self.second_column = SecondColumn()
     
-        panel.addLayout(buttons, 2)       
-        panel.addLayout(old_icon, 2)
-        panel.addWidget(arrow)
-        panel.addLayout(new_icon, 2)
+        columns.addLayout(self.first_column)
+        columns.addLayout(self.second_column)
 
-        layout.addLayout(panel)
+        layout.addLayout(columns)
         widget.setLayout(layout)
+
         self.setCentralWidget(widget)
-        self.setWindowTitle(text("title"))
-        self.setWindowIcon(QIcon("assets/colorfull_folder.ico"))
-        self.setFixedSize(QSize(512, 128))
+        self.setWindowTitle(WINDOW_TITLE)
+        self.setWindowIcon(QIcon(WINDOW_ICON))
+        # self.setFixedSize(QSize(512, 128))
