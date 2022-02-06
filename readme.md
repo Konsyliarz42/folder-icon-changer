@@ -1,37 +1,20 @@
-![Logo](./assets/Logo.png)
+![Logo](./Logo.png)
 
-[![Python application](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml/badge.svg?event=push)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/python-app.yml)
-[![Unittests](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/unittests.yml/badge.svg?branch=master&event=push)](https://github.com/Konsyliarz42/folder-icon-changer/actions/workflows/unittests.yml)
+## Introduction
 
-> ONLY FOR WINDOWS!
+Some time ago i created `Folder Icons Changer`.\
+The program to customize folders on windows,\
+but the program is always detect as virus.\
+And i can not fix it, so ...
 
-This is program to change folder icon, via adding desktop.ini to folder.
+### `I have closed this project`
 
-## Usage
+I leave releases and code on branch `old`.\
+But on `master` i leave` all my icons`.
 
-1. Select folder
-2. Select icon (only [.ico](https://en.wikipedia.org/wiki/ICO_(file_format)) type)
-3. Check preview
-4. Set icon
-5. Fell happy :)
+## Further
 
-## Manual 
-
-### Set icon
-
-```bash
-python -m icon_changer --folder <folder path> --icon <icon path> --index <index of icon>
-```
-
-- `folder path` - Path to chosen folder.
-- `icon path` - Path to chosen icon. Default: None
-- `index of icon` - Index of chosen icon in icon file. Default: 0
-
-### Remove icon
-
-```bash
-python -m icon_changer --folder <folder path>
-```
-
-- `folder path` - Path to chosen folder.
-
+I like my icons and in free time\
+i would have created new icons, so ...\
+`Some new icons will be appear`.\
+I hope...
