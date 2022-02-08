@@ -10,7 +10,7 @@ And i can not fix it, so ...
 ### `I have closed this project`
 
 I leave releases and code on branch `old`.\
-But on `master` i leave` all my icons`.
+But on `master` i leave `all my icons`.
 
 ## Further
 
